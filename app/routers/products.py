@@ -12,7 +12,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 # Función para verificar si el usuario es admin
 async def get_current_admin(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     user = auth_service.get_current_user(db, token)
-    if not user.is_admin:
+    # `is_admin` is stored as an Integer column (0/1). Convert to bool explicitly.
+    if not bool(user.is_admin):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permisos de administrador"
